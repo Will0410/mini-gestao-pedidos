@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!--
+      CA1707: nomes de teste usam underscore (Metodo_Cenario_Resultado).
+      CA1000: Result<T>.Success/Failure estáticos são o idioma padrão do Result pattern.
+      CA1848/CA1873: LoggerMessage source-gen é exagero para o volume de logs aqui.
+      CA1515/CA1062/CA2007: app (não biblioteca); nullable já cobre nulos; sem SynchronizationContext no ASP.NET Core.
+    -->
+    <NoWarn>$(NoWarn);CA1707;CA1000;CA1848;CA1873;CA1515;CA1062;CA2007;CA1716;CA1711;CA1720</NoWarn>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+</Project>

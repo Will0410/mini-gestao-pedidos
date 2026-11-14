@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Domínio puro: nenhuma dependência externa (regra do CLAUDE.md). -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Pedidos.UnitTests" />
+  </ItemGroup>
+</Project>
