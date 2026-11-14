@@ -19,9 +19,12 @@ public sealed partial class SqlServerFixture : IAsyncLifetime
     private MsSqlContainer? _container;
 
     // Logins são do SERVIDOR (não do banco). No modo externo, reutiliza a senha do compose para que o
-    // ALTER LOGIN de 03-logins.sql não quebre a API que já está rodando no mesmo SQL Server.
+    // ALTER LOGIN de 03-logins.sql não quebre a API nem o MCP que já usam o mesmo SQL Server.
     private static string AppPassword =>
         Environment.GetEnvironmentVariable("INTEGRATION_APP_DB_PASSWORD") ?? "App@Pedidos2026!";
+
+    private static string McpPassword =>
+        Environment.GetEnvironmentVariable("INTEGRATION_MCP_DB_PASSWORD") ?? "Mcp@ReadOnly2026!";
 
     public string DatabaseName { get; } = $"PedidosTest_{Guid.NewGuid():N}"[..24];
 
@@ -60,7 +63,7 @@ public sealed partial class SqlServerFixture : IAsyncLifetime
         {
             ["DB_NAME"] = DatabaseName,
             ["APP_DB_PASSWORD"] = AppPassword,
-            ["MCP_DB_PASSWORD"] = "Mcp@IntegrationTests1!",
+            ["MCP_DB_PASSWORD"] = McpPassword,
         };
         await RunScriptAsync(AdminConnectionString, "01-schema.sql", variables);
         await RunScriptAsync(AdminConnectionString, "03-logins.sql", variables);

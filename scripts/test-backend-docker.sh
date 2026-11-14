@@ -21,6 +21,7 @@ docker run --rm \
   -e INTEGRATION_SQL_SERVER=sqlserver \
   -e INTEGRATION_SQL_SA_PASSWORD="${SA_PASSWORD:-Pedidos@Local2026!}" \
   -e INTEGRATION_APP_DB_PASSWORD="${APP_DB_PASSWORD:-App@Pedidos2026!}" \
+  -e INTEGRATION_MCP_DB_PASSWORD="${MCP_DB_PASSWORD:-Mcp@ReadOnly2026!}" \
   -e DOTNET_CLI_TELEMETRY_OPTOUT=1 \
   mcr.microsoft.com/dotnet/sdk:10.0 \
   bash -c '
