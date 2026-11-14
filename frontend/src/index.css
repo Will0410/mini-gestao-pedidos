@@ -88,6 +88,7 @@ h2 { font-size: 1.05rem; }
 .tabela-wrapper[aria-busy='true'] { opacity: 0.6; }
 .tabela { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
 .tabela th { text-align: left; font-weight: 600; color: var(--muted); font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.tabela th.num { text-align: right; }
 .tabela th, .tabela td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
 .tabela tbody tr:hover { background: var(--surface-2); }
 .tabela__linha--nova { background: var(--highlight); }
