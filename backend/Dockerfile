@@ -15,7 +15,7 @@ COPY src/ src/
 RUN dotnet publish src/Pedidos.Api/Pedidos.Api.csproj -c Release -o /app --no-restore /p:UseAppHost=false
 
 # ---- runtime ----
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:11.0-alpine AS runtime
 # icu-libs: globalização completa (SqlClient/colações); wget já vem no busybox (healthcheck).
 RUN apk add --no-cache icu-libs
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
