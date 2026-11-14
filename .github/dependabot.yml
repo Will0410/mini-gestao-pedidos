@@ -1,23 +1,65 @@
+# Política de atualização:
+#  - Runtime fixo em versões LTS: .NET 10 (até nov/2028) e Node 24. Majors de runtime são decisão
+#    humana (planejada), não PR automático — por isso são ignorados aqui.
+#  - Patches e minors agrupados em UM PR semanal por ecossistema (menos ruído, revisão mais fácil).
+#  - Alertas/correções de SEGURANÇA continuam chegando independentemente destas regras.
 version: 2
 updates:
   - package-ecosystem: nuget
     directory: /backend
-    schedule: { interval: weekly }
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
     groups:
-      microsoft:
-        patterns: ["Microsoft.*", "System.*"]
+      nuget-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Pacotes versionados junto com o runtime: seguem o .NET 10 LTS.
+      - dependency-name: "Microsoft.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Swashbuckle.AspNetCore.*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: npm
     directory: /frontend
-    schedule: { interval: weekly }
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      # TypeScript 7 (compilador nativo) exige migração planejada.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: npm
     directory: /tools/mcp-sqlserver
-    schedule: { interval: weekly }
+    schedule: { interval: weekly, day: monday }
+    groups:
+      mcp-minor-patch:
+        update-types: [minor, patch]
+
   - package-ecosystem: docker
     directory: /backend
-    schedule: { interval: weekly }
+    schedule: { interval: weekly, day: monday }
+    ignore:
+      - dependency-name: "dotnet/*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: docker
     directory: /frontend
-    schedule: { interval: weekly }
+    schedule: { interval: weekly, day: monday }
+    ignore:
+      # Só versões LTS (pares) do Node.
+      - dependency-name: node
+        versions: [">=25"]
+
   - package-ecosystem: github-actions
     directory: /
-    schedule: { interval: weekly }
+    schedule: { interval: weekly, day: monday }
+    groups:
+      actions:
+        patterns: ["*"]

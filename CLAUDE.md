@@ -76,7 +76,7 @@ Dependências entre camadas: `Api → Application → Domain` e `Api → Infrast
 | Lint/typecheck front | `cd frontend && npm run lint && npm run typecheck` |
 | Testes unitários front | `cd frontend && npm test` |
 | E2E | `docker compose up -d --build && cd frontend && npx playwright test` |
-| Carga | `docker run --rm -i --network host grafana/k6 run - < tests/load/pedidos.k6.js` |
+| Carga | `docker run --rm -i --network pedidos_default -e BASE_URL=http://api:8080 grafana/k6:2.4.0 run - < tests/load/pedidos.k6.js` |
 
 ## Ferramentas do Claude neste repo
 

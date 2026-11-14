@@ -1,7 +1,7 @@
 // Teste de carga (k6) — valida RNF-02: GET /pedidos p95 < 200 ms com 50 VUs e 20k pedidos.
 //
 // Rodar contra o compose (rede interna, sem passar pelo host):
-//   docker run --rm -i --network pedidos_default -e BASE_URL=http://api:8080 grafana/k6 run - < tests/load/pedidos.k6.js
+//   docker run --rm -i --network pedidos_default -e BASE_URL=http://api:8080 grafana/k6:2.4.0 run - < tests/load/pedidos.k6.js
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Trend, Rate } from 'k6/metrics';

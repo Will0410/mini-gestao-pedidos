@@ -73,7 +73,7 @@ gerados de forma determinística (mesmos dados em toda máquina).
 | Frontend (18) | `cd frontend && npm ci && npm test` | Validação do formulário, cálculo do total, filtros na URL, modal (Testing Library) |
 | **E2E** (4) | `docker compose up -d --build` e `cd frontend && npx playwright install chromium && npx playwright test` | Criar pedido no modal e vê-lo no topo da listagem (CA-14), filtro por cliente na URL, validação, ranking |
 | MCP | `cd tools/mcp-sqlserver && npm ci && npm test` (e `npm run smoke` com o banco no ar) | Validação somente leitura e resumo do plano de execução |
-| Carga | `docker run --rm -i --network pedidos_default -e BASE_URL=http://api:8080 grafana/k6 run - < tests/load/pedidos.k6.js` | 50 VUs + escrita concorrente, thresholds de latência |
+| Carga | `docker run --rm -i --network pedidos_default -e BASE_URL=http://api:8080 grafana/k6:2.4.0 run - < tests/load/pedidos.k6.js` | 50 VUs + escrita concorrente, thresholds de latência |
 
 Integração com o SQL Server do compose em vez de Testcontainers:
 `INTEGRATION_SQL_SERVER=localhost,14333 dotnet test --project tests/Pedidos.IntegrationTests`.
