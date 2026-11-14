@@ -178,7 +178,7 @@ para o usuário. O "AI First" aqui está no **processo de desenvolvimento** (se�
 | Agente de IA destrutivo | Hook `guard.mjs` bloqueia `DROP`, `reset --hard`, push forçado, edição de `.env`; MCP somente leitura em 3 camadas. |
 | XSS / clickjacking | React escapa por padrão; CSP restritiva, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`. |
 | Container | API roda como usuário não-root (`app`, uid 1654); imagem final sem SDK/node. |
-| Dependências | CI falha com pacote NuGet High/Critical e com `npm audit` de produção ≥ high. Hoje: 0 vulnerabilidades em produção (há 7 *moderate* em dependências **só de desenvolvimento** do ESLint, que não entram na imagem). |
+| Dependências e código | Dependabot com política LTS, CodeQL (C# e TypeScript), secret scanning com push protection; CI falha com pacote NuGet High/Critical e com `npm audit` de produção ≥ high. Hoje: **0 vulnerabilidades** (produção e desenvolvimento). |
 
 **Achados da minha revisão de segurança** (cada um reproduzido por teste antes de corrigir — commit `fix(security)`):
 1. O rate limit "por IP" usava o IP do nginx → virava um limite **global** para todos os usuários.

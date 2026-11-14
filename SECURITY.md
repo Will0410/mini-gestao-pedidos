@@ -15,7 +15,7 @@ fale diretamente com o mantenedor. Inclua passos para reproduzir e o impacto esp
 
 ## Controles em vigor
 
-- **Dependências**: Dependabot (atualizações + alertas de segurança); o CI falha com pacote NuGet
+- **Dependências e código**: Dependabot (atualizações + alertas de segurança), CodeQL (SAST de C# e TypeScript), secret scanning com push protection; o CI falha com pacote NuGet
   High/Critical e com `npm audit` de produção ≥ high.
 - **Código**: consultas parametrizadas (EF Core), validação de entrada com limites, Problem Details sem stack
   trace, rate limit no POST, CORS restrito, headers de segurança (CSP, `X-Frame-Options`, `nosniff`).
