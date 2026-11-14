@@ -11,6 +11,9 @@ internal sealed class GlobalExceptionHandler(
     IProblemDetailsService problemDetails,
     ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
+    internal static string SemQuebraDeLinha(string? valor) =>
+        (valor ?? string.Empty).Replace("\r", string.Empty, StringComparison.Ordinal).Replace("\n", string.Empty, StringComparison.Ordinal);
+
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken ct)
     {
         var (status, title, detail) = exception switch
@@ -20,13 +23,15 @@ internal sealed class GlobalExceptionHandler(
             _ => (StatusCodes.Status500InternalServerError, "Erro interno", "Ocorreu um erro inesperado. Use o traceId para suporte."),
         };
 
+        // Path e mensagem vêm do cliente: removemos quebras de linha para impedir log forging
+        // (injeção de linhas falsas no log em formato texto). Achado do CodeQL (cs/log-forging).
         if (status >= 500)
         {
-            logger.LogError(exception, "Erro não tratado em {Method} {Path}", context.Request.Method, context.Request.Path);
+            logger.LogError(exception, "Erro não tratado em {Method} {Path}", context.Request.Method, SemQuebraDeLinha(context.Request.Path.Value));
         }
         else
         {
-            logger.LogInformation("Requisição rejeitada ({Status}): {Message}", status, exception.Message);
+            logger.LogInformation("Requisição rejeitada ({Status}): {Message}", status, SemQuebraDeLinha(exception.Message));
         }
 
         context.Response.StatusCode = status;

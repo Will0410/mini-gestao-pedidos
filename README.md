@@ -68,7 +68,7 @@ gerados de forma determinística (mesmos dados em toda máquina).
 | Suíte | Comando | O que cobre |
 |---|---|---|
 | **Unitários** (48) | `cd backend && dotnet test --project tests/Pedidos.UnitTests` | Domínio, validadores e handler com fakes em memória: cliente inexistente/inativo, produto inexistente, estoque insuficiente (com rollback), pedido sem itens, quantidade inválida, produto repetido, preço não vem do cliente, corrida de estoque, limites de paginação/data |
-| **Integração** (27) | `cd backend && dotnet test --project tests/Pedidos.IntegrationTests` | Endpoints reais (`WebApplicationFactory`) contra **SQL Server real** via **Testcontainers**, aplicando os mesmos scripts de `database/init` e conectando com o login de menor privilégio. Inclui **20 pedidos concorrentes** para um produto com estoque 5 → exatamente 5 sucessos |
+| **Integração** (30) | `cd backend && dotnet test --project tests/Pedidos.IntegrationTests` | Endpoints reais (`WebApplicationFactory`) contra **SQL Server real** via **Testcontainers**, aplicando os mesmos scripts de `database/init` e conectando com o login de menor privilégio. Inclui **20 pedidos concorrentes** para um produto com estoque 5 → exatamente 5 sucessos |
 | Backend sem SDK local | `./scripts/test-backend-docker.sh` | As duas suítes acima dentro de um container do SDK, usando o SQL Server do compose |
 | Frontend (18) | `cd frontend && npm ci && npm test` | Validação do formulário, cálculo do total, filtros na URL, modal (Testing Library) |
 | **E2E** (4) | `docker compose up -d --build` e `cd frontend && npx playwright install chromium && npx playwright test` | Criar pedido no modal e vê-lo no topo da listagem (CA-14), filtro por cliente na URL, validação, ranking |
@@ -184,6 +184,8 @@ para o usuário. O "AI First" aqui está no **processo de desenvolvimento** (se�
 1. O rate limit "por IP" usava o IP do nginx → virava um limite **global** para todos os usuários.
 2. `?page=2147483647` estourava o cálculo do offset → **500**.
 3. `?dataFim=9999-12-31` estourava `DateOnly.AddDays(1)` → **500**.
+4. **CodeQL** (`cs/log-forging`, médio): `Request.Path` e a mensagem da exceção iam para o log sem sanitização — um path com `
+` forjaria linhas falsas no log. Quebras de linha agora são removidas (teste em `Seguranca/LogForgingTests.cs`).
 
 Riscos aceitos (contexto de avaliação local): sem autenticação (fora de escopo na spec), Swagger habilitado e
 porta da API publicada para facilitar a avaliação, senhas padrão no compose. Em produção: API privada atrás do

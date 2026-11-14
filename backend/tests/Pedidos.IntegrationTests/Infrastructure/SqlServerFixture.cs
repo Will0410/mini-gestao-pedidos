@@ -83,7 +83,7 @@ public sealed partial class SqlServerFixture : IAsyncLifetime
     /// <summary>Executa um script .sql como o sqlcmd: divide em lotes por "GO" e substitui $(VAR).</summary>
     private static async Task RunScriptAsync(string connectionString, string fileName, IReadOnlyDictionary<string, string> variables)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "database", fileName);
+        var path = Path.Join(AppContext.BaseDirectory, "database", fileName); // Join: não descarta segmentos (CodeQL cs/path-combine)
         var script = await File.ReadAllTextAsync(path);
         foreach (var (key, value) in variables)
         {
