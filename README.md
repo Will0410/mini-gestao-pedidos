@@ -354,7 +354,7 @@ foram os testes contra banco real, a leitura crítica do plano e uma revisão de
 
 ### 8.6 Ambiente
 
-A máquina de desenvolvimento tem Windows Application Control, que bloqueou executáveis de teste recém-compilados.
+O Windows Application Control do ambiente de desenvolvimento bloqueou executáveis de teste recém-compilados.
 Por isso existe `scripts/test-backend-docker.sh`, que roda as suítes num container — e que também serve para quem
 avalia sem o .NET SDK instalado.
 

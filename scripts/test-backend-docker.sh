@@ -2,8 +2,8 @@
 # Roda testes unitários + de integração do backend DENTRO de um container do SDK .NET,
 # usando o SQL Server do docker compose (rede "pedidos_default").
 #
-# Útil quando a máquina não tem o .NET SDK ou quando políticas corporativas (ex.: Windows
-# Application Control) bloqueiam executáveis recém-compilados. Não precisa de nada além do Docker.
+# Útil quando a máquina não tem o .NET SDK ou quando políticas de segurança do sistema
+# (ex.: Windows Application Control) bloqueiam executáveis recém-compilados. Só precisa do Docker.
 #
 # Uso:  ./scripts/test-backend-docker.sh            (sobe o banco se necessário)
 set -euo pipefail

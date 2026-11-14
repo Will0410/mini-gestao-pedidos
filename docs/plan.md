@@ -41,7 +41,7 @@
 |---|---|---|---|
 | E1 | O plano dizia .NET 8, mas o suporte do .NET 8 terminou em **10/11/2026** (4 dias antes da entrega). | **.NET 10 (LTS)**. | O teste aceita ".NET 8 ou superior"; entregar em runtime sem patches de segurança seria um erro. |
 | E2 | xUnit v3 + SDK 10 exige Microsoft.Testing.Platform. | Opt-in em `global.json`; `dotnet test --project`. | Erro de build explícito do SDK; documentado no CLAUDE.md para o Claude não "voltar" ao comando antigo. |
-| E3 | A máquina de desenvolvimento (corporativa) tem Windows Application Control, que bloqueou executáveis de teste recém-compilados. | `scripts/test-backend-docker.sh` roda a suíte num container do SDK, usando o SQL do compose. | Problema de ambiente, não de código. O script também serve para quem avalia sem SDK instalado. |
+| E3 | O Windows Application Control do ambiente de desenvolvimento bloqueou executáveis de teste recém-compilados. | `scripts/test-backend-docker.sh` roda a suíte num container do SDK, usando o SQL do compose. | Problema de ambiente, não de código. O script também serve para quem avalia sem SDK instalado. |
 | E4 | Revisão de segurança achou 3 falhas que geravam 500 ou anulavam proteções (rate limit atrás do proxy, overflow de página, overflow de data). | Testes reproduzindo cada uma **antes** da correção; RN-12/RN-13 atualizadas na spec. | Spec continua sendo a fonte da verdade; os limites viraram regra explícita. |
 | E5 | `OrderBy` após projeção para record no EF não é traduzível (500 em `GET /pedidos/{id}`). | Ordenar antes da projeção. | Pego pelo teste de integração — o smoke manual não cobria a rota. |
 
