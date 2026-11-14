@@ -1,0 +1,79 @@
+# Sobe a aplicação completa com um único comando:  docker compose up --build
+# Frontend: http://localhost:8080   API/Swagger: http://localhost:5080/swagger   SQL: localhost,14333
+# Os valores padrão abaixo servem apenas para avaliação local; sobrescreva via arquivo .env.
+name: pedidos
+
+x-db-env: &db-env
+  SA_PASSWORD: ${SA_PASSWORD:-Pedidos@Local2026!}
+  APP_DB_PASSWORD: ${APP_DB_PASSWORD:-App@Pedidos2026!}
+  MCP_DB_PASSWORD: ${MCP_DB_PASSWORD:-Mcp@ReadOnly2026!}
+  DB_NAME: PedidosDb
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:-Pedidos@Local2026!}
+    ports:
+      - "${SQL_PORT:-14333}:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+  # Job único: aplica database/init/*.sql (idempotentes) e termina.
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      <<: *db-env
+      DB_HOST: sqlserver
+    volumes:
+      - ./database:/scripts:ro
+    entrypoint: ["/bin/bash", "/scripts/init.sh"]
+    restart: "no"
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      # Login de menor privilégio (sem DDL), criado por database/init/03-logins.sql.
+      ConnectionStrings__PedidosDb: "Server=sqlserver,1433;Database=PedidosDb;User Id=pedidos_app;Password=${APP_DB_PASSWORD:-App@Pedidos2026!};TrustServerCertificate=True;Encrypt=True"
+      Cors__AllowedOrigins__0: "http://localhost:${FRONTEND_PORT:-8080}"
+      Swagger__Enabled: "true"
+    ports:
+      - "${API_PORT:-5080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  sqldata:
