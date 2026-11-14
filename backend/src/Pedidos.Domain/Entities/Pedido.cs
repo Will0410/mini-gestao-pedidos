@@ -72,7 +72,10 @@ public sealed class Pedido
             }
         }
 
-        var pedido = new Pedido(clienteId, DateTime.SpecifyKind(agoraUtc, DateTimeKind.Utc));
+        // Trunca para segundos: a coluna é DATETIME2(0), que ARREDONDA frações. Sem isso, a resposta do
+        // POST e um GET posterior poderiam divergir em até 1 segundo.
+        var dataPedido = new DateTime(agoraUtc.Ticks - (agoraUtc.Ticks % TimeSpan.TicksPerSecond), DateTimeKind.Utc);
+        var pedido = new Pedido(clienteId, dataPedido);
         foreach (var (produto, quantidade) in linhas)
         {
             // RN-07: o preço vem do cadastro do produto, nunca da requisição.
