@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Pedidos.Api.Endpoints;
 using Pedidos.Api.Http;
 using Pedidos.Application;
@@ -23,6 +24,21 @@ builder.WebHost.ConfigureKestrel(k => k.Limits.MaxRequestBodySize = 64 * 1024);
 builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
+
+// Atrás do nginx, RemoteIpAddress seria sempre o IP do proxy → o rate limit "por IP" viraria um
+// limite GLOBAL compartilhado por todos os usuários. Só confiamos em X-Forwarded-For vindo das redes
+// configuradas (rede interna do docker), para que um cliente externo não falsifique o próprio IP.
+builder.Services.Configure<ForwardedHeadersOptions>(o =>
+{
+    o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    o.ForwardLimit = 1;
+    o.KnownIPNetworks.Clear();
+    o.KnownProxies.Clear();
+    foreach (var cidr in builder.Configuration.GetSection("ReverseProxy:TrustedNetworks").Get<string[]>() ?? [])
+    {
+        o.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(cidr));
+    }
+});
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -53,6 +69,7 @@ builder.Services.AddRateLimiter(o =>
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 

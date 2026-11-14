@@ -1,4 +1,5 @@
 using FluentValidation;
+using Pedidos.Application.Common;
 
 namespace Pedidos.Application.Relatorios;
 
@@ -27,6 +28,8 @@ public sealed class TopClientesQueryValidator : AbstractValidator<TopClientesQue
     {
         RuleFor(x => x.DataInicio).NotNull().WithMessage("dataInicio é obrigatória.");
         RuleFor(x => x.DataFim).NotNull().WithMessage("dataFim é obrigatória.");
+        RuleFor(x => x.DataInicio).DentroDoPeriodoSuportado("dataInicio");
+        RuleFor(x => x.DataFim).DentroDoPeriodoSuportado("dataFim");
         RuleFor(x => x.DataFim)
             .Must((q, fim) => fim!.Value >= q.DataInicio!.Value)
             .WithMessage("dataFim deve ser maior ou igual a dataInicio.")

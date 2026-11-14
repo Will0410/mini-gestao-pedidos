@@ -56,6 +56,9 @@ services:
       ConnectionStrings__PedidosDb: "Server=sqlserver,1433;Database=PedidosDb;User Id=pedidos_app;Password=${APP_DB_PASSWORD:-App@Pedidos2026!};TrustServerCertificate=True;Encrypt=True"
       Cors__AllowedOrigins__0: "http://localhost:${FRONTEND_PORT:-8080}"
       Swagger__Enabled: "true"
+      # Confia no X-Forwarded-For apenas vindo do nginx (rede interna do docker).
+      ReverseProxy__TrustedNetworks__0: "172.16.0.0/12"
+      ReverseProxy__TrustedNetworks__1: "192.168.0.0/16"
     ports:
       - "${API_PORT:-5080}:8080"
     healthcheck:

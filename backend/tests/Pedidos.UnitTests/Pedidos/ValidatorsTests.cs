@@ -96,6 +96,25 @@ public sealed class ListarPedidosQueryValidatorTests
     }
 
     [Fact]
+    public void Validate_PaginaGiganteQueEstourariaOffset_Erro()
+    {
+        // CA-11 / RN-12: (page - 1) * pageSize estourava int → 500.
+        Assert.False(_validator.Validate(new ListarPedidosQuery(null, null, null, int.MaxValue, 100)).IsValid);
+    }
+
+    [Theory]
+    [InlineData(1999, 12, 31)]
+    [InlineData(2101, 1, 1)]
+    [InlineData(9999, 12, 31)]
+    public void Validate_DataForaDoIntervaloSuportado_Erro(int ano, int mes, int dia)
+    {
+        // CA-11 / RN-13
+        var data = new DateOnly(ano, mes, dia);
+        Assert.False(_validator.Validate(new ListarPedidosQuery(null, data, null)).IsValid);
+        Assert.False(_validator.Validate(new ListarPedidosQuery(null, null, data)).IsValid);
+    }
+
+    [Fact]
     public void Validate_DataInicioMaiorQueFim_Erro()
     {
         // CA-11 / RN-13
@@ -131,6 +150,10 @@ public sealed class TopClientesQueryValidatorTests
 
         Assert.False(result.IsValid);
     }
+
+    [Fact]
+    public void Validate_DataPertoDoMaxValue_ErroEmVezDeOverflow() =>
+        Assert.False(_validator.Validate(new TopClientesQuery(new DateOnly(9999, 12, 30), new DateOnly(9999, 12, 31))).IsValid);
 
     [Fact]
     public void Validate_AnoInteiro_Valido() =>

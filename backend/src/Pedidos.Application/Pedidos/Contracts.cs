@@ -44,6 +44,9 @@ public sealed record ListarPedidosQuery(
     public const int PaginaPadrao = 1;
     public const int TamanhoPadrao = 20;
     public const int TamanhoMaximo = 100;
+
+    /// <summary>Com pageSize ≤ 100, o offset máximo (10 milhões) cabe folgado em int.</summary>
+    public const int PaginaMaxima = 100_000;
 }
 
 public sealed record PagedResponse<T>(IReadOnlyList<T> Items, int Page, int PageSize, int TotalItems)

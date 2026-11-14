@@ -40,8 +40,8 @@ com filtros e paginação e veja um **ranking dos 5 clientes** com maior valor c
 | RN-09 | A **data do pedido** é atribuída pelo servidor (UTC) no momento da criação. |
 | RN-10 | A baixa de estoque deve ser segura sob **concorrência**: dois pedidos simultâneos nunca podem deixar o estoque negativo. |
 | RN-11 | Listagem: ordenada por data decrescente (mais recente primeiro), desempate por `Id` decrescente. |
-| RN-12 | Paginação: `page ≥ 1`, `1 ≤ pageSize ≤ 100`, padrão `page=1`, `pageSize=20`. |
-| RN-13 | Filtros de período: `dataInicio ≤ dataFim`; ambos opcionais na listagem; **obrigatórios** no relatório. |
+| RN-12 | Paginação: `1 ≤ page ≤ 100.000`, `1 ≤ pageSize ≤ 100`, padrão `page=1`, `pageSize=20`. (Limite superior de `page` evita overflow no cálculo do offset.) |
+| RN-13 | Filtros de período: `dataInicio ≤ dataFim`, ambas entre **2000-01-01 e 2100-12-31**; opcionais na listagem; **obrigatórias** no relatório. |
 | RN-14 | Relatório top clientes: 5 clientes com maior soma de `ValorTotal` no período; desempate por menor `ClienteId` (determinístico). Clientes sem pedidos no período não aparecem. |
 | RN-15 | Período máximo aceito pelo relatório: 366 dias × 5 (≈ 5 anos), para proteger o banco de varreduras abusivas. |
 
@@ -230,7 +230,7 @@ Formato Given/When/Then. Cada critério tem pelo menos um teste automatizado (co
 | CA-08 | **Dado** preço enviado pelo cliente (campo extra), **então** é ignorado; vale o preço do cadastro. | Unit |
 | CA-09 | **Dado** filtros de cliente e período, **quando** GET /pedidos, **então** só retornam pedidos daquele cliente no período (datas inclusivas), ordenados por data desc. | Integração |
 | CA-10 | **Dado** 25 pedidos e `pageSize=10`, **então** `page=3` retorna 5 itens, `totalPages=3`. | Integração |
-| CA-11 | **Dado** `pageSize=500` ou `dataInicio > dataFim`, **então** 400. | Unit + Integração |
+| CA-11 | **Dado** `pageSize=500`, `page=2147483647`, `dataInicio > dataFim` ou data fora de 2000–2100, **então** 400 (nunca 500). | Unit + Integração |
 | CA-12 | **Dado** pedidos de vários clientes no período, **quando** GET /relatorios/top-clientes, **então** retorna no máximo 5, ordenados por valor desc, ignorando pedidos fora do período. | Integração |
 | CA-13 | **Dado** relatório sem `dataInicio`/`dataFim`, **então** 400. | Integração |
 | CA-14 | **Dado** o frontend aberto, **quando** o usuário cria um pedido no modal, **então** o pedido aparece no topo da listagem. | E2E (Playwright) |

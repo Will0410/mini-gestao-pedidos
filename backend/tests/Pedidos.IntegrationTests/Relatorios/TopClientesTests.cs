@@ -47,6 +47,7 @@ public sealed class TopClientesTests(SqlServerFixture sql) : IntegrationTestBase
     [InlineData("?dataInicio=2026-01-01")]
     [InlineData("?dataFim=2026-12-31")]
     [InlineData("?dataInicio=2026-12-31&dataFim=2026-01-01")]
+    [InlineData("?dataInicio=9999-12-30&dataFim=9999-12-31")] // estourava DateOnly.MaxValue (500)
     public async Task TopClientes_SemDatasOuPeriodoInvertido_Retorna400(string query)
     {
         // CA-13
@@ -59,7 +60,7 @@ public sealed class TopClientesTests(SqlServerFixture sql) : IntegrationTestBase
     public async Task TopClientes_PeriodoSemPedidos_RetornaListaVazia()
     {
         var ranking = await Client.GetFromJsonAsync<List<TopClienteResponse>>(
-            "/relatorios/top-clientes?dataInicio=1990-01-01&dataFim=1990-12-31", Json, Ct);
+            "/relatorios/top-clientes?dataInicio=2099-01-01&dataFim=2099-12-31", Json, Ct);
 
         Assert.Empty(ranking!);
     }

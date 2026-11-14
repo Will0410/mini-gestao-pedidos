@@ -69,6 +69,9 @@ public sealed class ListarPedidosTests(SqlServerFixture sql) : IntegrationTestBa
     [InlineData("page=0")]
     [InlineData("dataInicio=2026-02-01&dataFim=2026-01-01")]
     [InlineData("dataInicio=31-12-2026")]
+    [InlineData("page=2147483647&pageSize=100")] // overflow do offset (achado na revisão de segurança)
+    [InlineData("dataFim=9999-12-31")]           // AddDays(1) estourava DateOnly.MaxValue
+    [InlineData("dataInicio=1753-01-01")]
     public async Task Get_ParametrosInvalidos_Retorna400(string query)
     {
         // CA-11

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Pedidos.Application.Common;
 using Pedidos.Domain;
 
 namespace Pedidos.Application.Pedidos;
@@ -44,7 +45,11 @@ public sealed class ListarPedidosQueryValidator : AbstractValidator<ListarPedido
     public ListarPedidosQueryValidator()
     {
         RuleFor(x => x.ClienteId).GreaterThan(0).When(x => x.ClienteId.HasValue);
-        RuleFor(x => x.Page).GreaterThanOrEqualTo(1).WithMessage("page deve ser >= 1.");             // RN-12
+        RuleFor(x => x.Page)                                                                          // RN-12
+            .InclusiveBetween(1, ListarPedidosQuery.PaginaMaxima)
+            .WithMessage($"page deve estar entre 1 e {ListarPedidosQuery.PaginaMaxima}.");
+        RuleFor(x => x.DataInicio).DentroDoPeriodoSuportado("dataInicio");                           // RN-13
+        RuleFor(x => x.DataFim).DentroDoPeriodoSuportado("dataFim");
         RuleFor(x => x.PageSize)
             .InclusiveBetween(1, ListarPedidosQuery.TamanhoMaximo)
             .WithMessage($"pageSize deve estar entre 1 e {ListarPedidosQuery.TamanhoMaximo}.");      // RN-12
