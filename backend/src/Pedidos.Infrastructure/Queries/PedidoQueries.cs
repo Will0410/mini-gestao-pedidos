@@ -59,15 +59,16 @@ internal sealed class PedidoQueries(PedidosDbContext db) : IPedidoQueries
             return null;
         }
 
+        // OrderBy ANTES da projeção: o EF não traduz ordenação sobre o construtor de um record.
         var itens = await db.ItensPedido.AsNoTracking()
             .Where(i => i.PedidoId == id)
+            .OrderBy(i => i.ProdutoId)
             .Join(db.Produtos, i => i.ProdutoId, p => p.Id, (i, p) => new ItemPedidoResponse(
                 i.ProdutoId,
                 p.Nome,
                 i.Quantidade,
                 i.PrecoUnitario,
                 i.Quantidade * i.PrecoUnitario))
-            .OrderBy(i => i.ProdutoId)
             .ToListAsync(ct);
 
         return new PedidoDetalheResponse(cabecalho.Id, cabecalho.ClienteId, cabecalho.Nome, cabecalho.DataPedido, cabecalho.ValorTotal, itens);
