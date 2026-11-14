@@ -23,11 +23,13 @@ internal sealed class GlobalExceptionHandler(
             _ => (StatusCodes.Status500InternalServerError, "Erro interno", "Ocorreu um erro inesperado. Use o traceId para suporte."),
         };
 
-        // Path e mensagem vêm do cliente: removemos quebras de linha para impedir log forging
-        // (injeção de linhas falsas no log em formato texto). Achado do CodeQL (cs/log-forging).
+        // Log forging (CodeQL cs/log-forging): nada que o cliente controla vai cru para o log.
+        // No erro 500 registramos o endpoint pelo TEMPLATE da rota (ex.: "HTTP: POST /pedidos/"), definido
+        // no código — não o path/método enviados, que podem conter quebras de linha forjadas.
         if (status >= 500)
         {
-            logger.LogError(exception, "Erro não tratado em {Method} {Path}", context.Request.Method, SemQuebraDeLinha(context.Request.Path.Value));
+            var endpoint = context.GetEndpoint()?.DisplayName ?? "(sem endpoint)";
+            logger.LogError(exception, "Erro não tratado em {Endpoint}", endpoint);
         }
         else
         {
