@@ -3,7 +3,7 @@
 Cadastro e consulta de pedidos de clientes — **.NET 10 + EF Core + SQL Server + React 19/TypeScript** —
 desenvolvido com **Claude Code** em fluxo *Spec-Driven Development* (SDD).
 
-[![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
+[![CI](https://github.com/Will0410/mini-gestao-pedidos/actions/workflows/ci.yml/badge.svg)](https://github.com/Will0410/mini-gestao-pedidos/actions/workflows/ci.yml)
 
 | Documento | Conteúdo |
 |---|---|
