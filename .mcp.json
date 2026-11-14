@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "sqlserver": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["tools/mcp-sqlserver/index.mjs"],
+      "env": {
+        "MSSQL_HOST": "${MSSQL_HOST:-localhost}",
+        "MSSQL_PORT": "${SQL_PORT:-14333}",
+        "MSSQL_DATABASE": "PedidosDb",
+        "MSSQL_USER": "mcp_readonly",
+        "MSSQL_PASSWORD": "${MCP_DB_PASSWORD:-Mcp@ReadOnly2026!}"
+      }
+    }
+  }
+}

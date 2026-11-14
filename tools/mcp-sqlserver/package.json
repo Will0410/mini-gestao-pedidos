@@ -1,0 +1,22 @@
+{
+  "name": "pedidos-mcp-sqlserver",
+  "version": "1.0.0",
+  "description": "MCP server somente leitura para o SQL Server do projeto Mini Gestão de Pedidos",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs",
+    "test": "node --test test/*.test.mjs",
+    "smoke": "node test/smoke.mjs"
+  },
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "mssql": "^12.7.14",
+    "zod": "^4.6.7"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
