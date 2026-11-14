@@ -25,4 +25,11 @@ public sealed class Cliente
     public bool Ativo { get; private set; }
 
     public DateTime DataCadastro { get; private set; }
+
+    /// <summary>Usado só em testes para simular o Id gerado pelo banco.</summary>
+    internal Cliente ComId(int id)
+    {
+        Id = id;
+        return this;
+    }
 }

@@ -21,11 +21,13 @@ public sealed class CriarPedidoRequestValidator : AbstractValidator<CriarPedidoR
             .NotEmpty().WithMessage("O pedido deve ter pelo menos 1 item.")                       // RN-01
             .Must(i => i!.Count <= Errors.Pedido.MaxItens)
                 .WithMessage($"O pedido pode ter no máximo {Errors.Pedido.MaxItens} itens.")       // RN-01
+            .Must(i => i!.All(x => x is not null))
+                .WithMessage("Item do pedido não pode ser nulo.")
             .Must(i => i!.Select(x => x.ProdutoId).Distinct().Count() == i!.Count)
                 .WithMessage("Um produto não pode aparecer em mais de um item; some as quantidades."); // RN-05
 
         RuleForEach(x => x.Itens)
-            .NotNull().WithMessage("Item do pedido não pode ser nulo.")
+            .Where(i => i is not null)
             .ChildRules(item =>
         {
             item.RuleFor(i => i.ProdutoId)
