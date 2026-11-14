@@ -19,7 +19,9 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString(ConnectionStringName)
             ?? throw new InvalidOperationException($"ConnectionStrings:{ConnectionStringName} não configurada.");
 
-        services.AddDbContext<PedidosDbContext>(options => options.UseSqlServer(connectionString, sql =>
+        // Pool de DbContext: reaproveita instâncias entre requisições (menos alocação e menos trabalho de
+        // inicialização por request). Seguro aqui porque o contexto não guarda estado próprio além do EF.
+        services.AddDbContextPool<PedidosDbContext>(options => options.UseSqlServer(connectionString, sql =>
         {
             // Retry para falhas transitórias (ex.: SQL Server reiniciando). Seguro porque o UnitOfWork
             // usa a execution strategy em volta da transação inteira.
