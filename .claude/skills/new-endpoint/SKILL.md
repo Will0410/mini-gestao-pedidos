@@ -24,7 +24,7 @@ Siga **na ordem**. Não pule etapas; se uma etapa não se aplicar, diga explicit
 
 ## 4. Caso de uso
 - Escrita: `XxxHandler` com `Task<Result<XxxResponse>> HandleAsync(XxxRequest, CancellationToken)`.
-  - Erros de negócio via `Errors.*` (adicione em `Application/Common/Errors.cs` se for novo). **Nada de exceptions.**
+  - Erros de negócio via `Errors.*` (adicione em `backend/src/Pedidos.Domain/Errors.cs` se for novo). **Nada de exceptions.**
   - Escritas múltiplas dentro de `IUnitOfWork.ExecutarEmTransacaoAsync`.
 - Leitura: método em um `IXxxQueries` (interface na Application, implementação na Infrastructure) com `AsNoTracking()` + `Select` para o DTO.
 - Registre no `Application/DependencyInjection.cs` (ou `Infrastructure/DependencyInjection.cs`).
@@ -38,7 +38,11 @@ Siga **na ordem**. Não pule etapas; se uma etapa não se aplicar, diga explicit
        .Produces<XxxResponse>()
        .ProducesProblem(StatusCodes.Status404NotFound);
   ```
-- Requests com corpo: use `.AddEndpointFilter<ValidationFilter<XxxRequest>>()`.
+- Query string: receba `[AsParameters] XxxQuery query` + `IValidator<XxxQuery> validator` e, se inválido,
+  `return validacao.ToError().ToProblem();` (ver `GET /pedidos` em `PedidosEndpoints.cs`).
+- Corpo (escrita): o handler valida o request e retorna `Result`; o endpoint só traduz com `ToProblem()`.
+- Escrita pública: adicione `.RequireRateLimiting(PedidosEndpoints.RateLimitEscrita)`.
+- Datas de filtro: use `.DentroDoPeriodoSuportado("campo")` (`Application/Common/Periodo.cs`) para evitar overflow.
 - Se for grupo novo, registre em `Program.cs` (`app.MapXxxEndpoints()`).
 
 ## 6. Testes
@@ -52,7 +56,9 @@ Siga **na ordem**. Não pule etapas; se uma etapa não se aplicar, diga explicit
 Rode e mostre o resultado:
 ```bash
 dotnet build backend/Pedidos.sln
-dotnet test backend/tests/Pedidos.UnitTests
-dotnet test backend/tests/Pedidos.IntegrationTests --filter "FullyQualifiedName~<Feature>"
+cd backend
+dotnet test --project tests/Pedidos.UnitTests
+dotnet test --project tests/Pedidos.IntegrationTests -- --filter-class "*<Feature>*"
+# sem SDK local / máquina com Application Control: ./scripts/test-backend-docker.sh
 ```
 Depois proponha a mensagem de commit (`feat(api): ...`).

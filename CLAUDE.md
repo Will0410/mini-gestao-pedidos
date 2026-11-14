@@ -25,7 +25,7 @@ backend/src/
 backend/tests/
   Pedidos.UnitTests/         xUnit, sem banco, fakes em memória (tests/Fakes).
   Pedidos.IntegrationTests/  xUnit + Testcontainers (SQL Server real) + WebApplicationFactory.
-frontend/             React 18 + TypeScript + Vite + TanStack Query. src/api (cliente tipado), src/features/*.
+frontend/             React 19 + TypeScript + Vite + TanStack Query. src/api (cliente tipado), src/features/*.
 frontend/e2e/         Playwright.
 tools/mcp-sqlserver/  Servidor MCP somente leitura para o SQL Server.
 tests/load/           Scripts k6.
@@ -40,7 +40,8 @@ Dependências entre camadas: `Api → Application → Domain` e `Api → Infrast
 - Idioma do domínio: **português** (`Pedido`, `ItemPedido`, `ValorTotal`); termos técnicos em inglês (`Handler`, `Repository`, `Endpoint`).
 - File-scoped namespaces; `sealed` por padrão; `record` para DTOs/requests/responses; nullable habilitado; warnings = erros.
 - Nomes: `PascalCase` para tipos/métodos/propriedades, `_camelCase` para campos privados, `camelCase` para locais, sufixo `Async` em métodos assíncronos.
-- Erros de negócio: **retorne `Result`/`Result<T>` com `Error`** (`Errors.Pedido.EstoqueInsuficiente(...)`). Não lance exceção para regra de negócio.
+- Erros de negócio: **retorne `Result`/`Result<T>` com `Error`** (`Errors.Pedido.EstoqueInsuficiente(...)`, catálogo em `Domain/Errors.cs`). Não lance exceção para regra de negócio.
+- Testes usam xUnit v3 sobre Microsoft.Testing.Platform (opt-in em `backend/global.json`): rode com `dotnet test --project <csproj>`.
 - Códigos de erro (`Error.Code`) são contrato com o frontend: `VALIDACAO`, `CLIENTE_NAO_ENCONTRADO`, `PRODUTO_NAO_ENCONTRADO`, `ESTOQUE_INSUFICIENTE`, `NAO_ENCONTRADO`.
 - Mapeamento HTTP: `Validation→400`, `NotFound→404`, `Unprocessable→422`, `Conflict→409` (ver `Api/Http/ResultExtensions.cs`).
 - Endpoints: um arquivo por agrupamento em `Api/Endpoints/` com `MapXxxEndpoints(this IEndpointRouteBuilder)`; sempre `.WithName()`, `.WithTags()`, `.Produces...()`.
@@ -65,9 +66,11 @@ Dependências entre camadas: `Api → Application → Domain` e `Api → Infrast
 |---|---|
 | Subir tudo | `docker compose up --build` (front: http://localhost:8080 · API: http://localhost:5080/swagger) |
 | Só o banco (dev local) | `docker compose up -d sqlserver db-init` |
-| Build backend | `dotnet build backend/Pedidos.sln` |
-| Testes unitários | `dotnet test backend/tests/Pedidos.UnitTests` |
-| Testes de integração | `dotnet test backend/tests/Pedidos.IntegrationTests` (requer Docker) |
+| Build backend | `dotnet build backend/Pedidos.sln` (.NET 10 SDK) |
+| Testes unitários | `cd backend && dotnet test --project tests/Pedidos.UnitTests` |
+| Testes de integração | `cd backend && dotnet test --project tests/Pedidos.IntegrationTests` (requer Docker; Testcontainers) |
+| Todos os testes backend sem SDK local | `./scripts/test-backend-docker.sh` (roda em container, usa o SQL do compose) |
+| Benchmark da Parte 4 | `./scripts/parte4-benchmark.sh` |
 | API local | `dotnet run --project backend/src/Pedidos.Api` (usa SQL em `localhost,14333`) |
 | Frontend dev | `cd frontend && npm install && npm run dev` (proxy `/api` → `localhost:5080`) |
 | Lint/typecheck front | `cd frontend && npm run lint && npm run typecheck` |
